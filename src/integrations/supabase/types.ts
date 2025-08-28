@@ -14,7 +14,177 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_actions: {
+        Row: {
+          action_type: string
+          admin_id: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          reason: string | null
+          target_user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          admin_id: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          target_user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          admin_id?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          reason?: string | null
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
+      admin_users: {
+        Row: {
+          admin_level: string | null
+          created_at: string | null
+          id: string
+          last_login: string | null
+          permissions: Json | null
+          user_id: string
+        }
+        Insert: {
+          admin_level?: string | null
+          created_at?: string | null
+          id?: string
+          last_login?: string | null
+          permissions?: Json | null
+          user_id: string
+        }
+        Update: {
+          admin_level?: string | null
+          created_at?: string | null
+          id?: string
+          last_login?: string | null
+          permissions?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fraud_signals: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          id: string
+          is_resolved: boolean | null
+          risk_score: number | null
+          signal_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          is_resolved?: boolean | null
+          risk_score?: number | null
+          signal_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          is_resolved?: boolean | null
+          risk_score?: number | null
+          signal_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          trust_level: string | null
+          trust_score: number | null
+          updated_at: string | null
+          user_id: string
+          user_type: string | null
+          verification_status: Json | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          trust_level?: string | null
+          trust_score?: number | null
+          updated_at?: string | null
+          user_id: string
+          user_type?: string | null
+          verification_status?: Json | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          trust_level?: string | null
+          trust_score?: number | null
+          updated_at?: string | null
+          user_id?: string
+          user_type?: string | null
+          verification_status?: Json | null
+        }
+        Relationships: []
+      }
+      verification_records: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          status: string | null
+          user_id: string
+          verification_data: Json | null
+          verification_type: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          status?: string | null
+          user_id: string
+          verification_data?: Json | null
+          verification_type: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          status?: string | null
+          user_id?: string
+          verification_data?: Json | null
+          verification_type?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
