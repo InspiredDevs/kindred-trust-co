@@ -19,38 +19,19 @@ import {
   Zap
 } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
-import { useState } from "react";
-import Dashboard from "./Dashboard";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<"landing" | "freelancer" | "client" | "admin">("landing");
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  if (currentView === "freelancer") {
-    return (
-      <>
-        <Navigation userType="freelancer" trustLevel="gold" />
-        <Dashboard userType="freelancer" />
-      </>
-    );
-  }
-
-  if (currentView === "client") {
-    return (
-      <>
-        <Navigation userType="client" />
-        <Dashboard userType="client" />
-      </>
-    );
-  }
-
-  if (currentView === "admin") {
-    return (
-      <>
-        <Navigation userType="admin" />
-        <Dashboard userType="admin" />
-      </>
-    );
-  }
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,7 +68,7 @@ const Index = () => {
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-white/90 shadow-trust text-lg px-8 py-6"
-                onClick={() => setCurrentView("freelancer")}
+                onClick={() => navigate('/auth')}
               >
                 I'm a Freelancer
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -96,7 +77,7 @@ const Index = () => {
                 size="lg" 
                 variant="outline" 
                 className="bg-white/10 text-white border-white/30 hover:bg-white/20 text-lg px-8 py-6"
-                onClick={() => setCurrentView("client")}
+                onClick={() => navigate('/auth')}
               >
                 I'm a Client
                 <Briefcase className="w-5 h-5 ml-2" />
@@ -240,10 +221,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card 
-              className="shadow-card hover:shadow-glow transition-all duration-300 cursor-pointer"
-              onClick={() => setCurrentView("freelancer")}
-            >
+            <Card className="shadow-card hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-trust rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
@@ -252,17 +230,14 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   Manage projects, track earnings, and build your reputation.
                 </p>
-                <Button className="w-full">
-                  View Demo
+                <Button className="w-full" onClick={() => navigate('/auth')}>
+                  Get Started
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
             </Card>
 
-            <Card 
-              className="shadow-card hover:shadow-glow transition-all duration-300 cursor-pointer"
-              onClick={() => setCurrentView("client")}
-            >
+            <Card className="shadow-card hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-trust rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Briefcase className="w-8 h-8 text-white" />
@@ -271,17 +246,14 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   Post jobs, manage projects, and find trusted talent.
                 </p>
-                <Button className="w-full">
-                  View Demo
+                <Button className="w-full" onClick={() => navigate('/auth')}>
+                  Get Started
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
             </Card>
 
-            <Card 
-              className="shadow-card hover:shadow-glow transition-all duration-300 cursor-pointer"
-              onClick={() => setCurrentView("admin")}
-            >
+            <Card className="shadow-card hover:shadow-glow transition-all duration-300">
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-gradient-trust rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Shield className="w-8 h-8 text-white" />
@@ -290,8 +262,11 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   Platform oversight, verification queue, and analytics.
                 </p>
-                <Button className="w-full">
-                  View Demo
+                <Button 
+                  className="w-full" 
+                  onClick={() => window.open('/admin-secret-access-portal-xyz', '_blank')}
+                >
+                  Admin Access
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>

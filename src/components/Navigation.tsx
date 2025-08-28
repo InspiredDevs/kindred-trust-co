@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "./ThemeToggle";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Menu, 
   Users, 
@@ -8,9 +10,12 @@ import {
   Bell,
   Search,
   MessageSquare,
-  Settings
+  Settings,
+  Home,
+  LogOut
 } from "lucide-react";
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface NavigationProps {
   userType?: "freelancer" | "client" | "admin" | null;
@@ -19,6 +24,13 @@ interface NavigationProps {
 
 export function Navigation({ userType, trustLevel }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const navigationItems = {
     freelancer: [
@@ -49,12 +61,14 @@ export function Navigation({ userType, trustLevel }: NavigationProps) {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-trust rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-trust bg-clip-text text-transparent">
-              Inspired Devs
-            </span>
+            <Link to="/" className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-trust rounded-lg flex items-center justify-center">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-trust bg-clip-text text-transparent">
+                Inspired Devs
+              </span>
+            </Link>
             {trustLevel && (
               <Badge variant="outline" className="ml-2 text-xs">
                 {trustLevel.charAt(0).toUpperCase() + trustLevel.slice(1)} Verified
@@ -81,7 +95,9 @@ export function Navigation({ userType, trustLevel }: NavigationProps) {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-2">
-            {userType && (
+            <ThemeToggle />
+            
+            {user && (
               <>
                 <Button variant="ghost" size="icon" className="relative">
                   <Bell className="w-5 h-5" />
@@ -92,15 +108,22 @@ export function Navigation({ userType, trustLevel }: NavigationProps) {
                 <Button variant="ghost" size="icon">
                   <Settings className="w-5 h-5" />
                 </Button>
+                <Button variant="ghost" onClick={handleSignOut}>
+                  <LogOut className="w-5 h-5" />
+                </Button>
               </>
             )}
             
-            {!userType && (
+            {!user && (
               <div className="flex items-center gap-2">
-                <Button variant="ghost">Sign In</Button>
-                <Button className="bg-gradient-hero text-white shadow-trust">
-                  Get Started
-                </Button>
+                <Link to="/auth">
+                  <Button variant="ghost">Sign In</Button>
+                </Link>
+                <Link to="/auth">
+                  <Button className="bg-gradient-hero text-white shadow-trust">
+                    Get Started
+                  </Button>
+                </Link>
               </div>
             )}
 
