@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrustBadge, TrustScore } from "@/components/TrustBadge";
 import { StatsCard } from "@/components/StatsCard";
+import { useProfile } from "@/hooks/useProfile";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigation } from "@/components/Navigation";
 import { 
   Users, 
   Briefcase, 
@@ -13,7 +16,8 @@ import {
   Shield,
   CheckCircle2,
   AlertTriangle,
-  Plus
+  Plus,
+  Loader2
 } from "lucide-react";
 
 interface DashboardProps {
@@ -31,18 +35,31 @@ export default function Dashboard({ userType }: DashboardProps) {
 }
 
 function FreelancerDashboard() {
+  const { profile, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'User';
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <Navigation userType="freelancer" trustLevel={profile?.trust_level as any} />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Welcome back, Alex!</h1>
+            <h1 className="text-3xl font-bold">Welcome back, {displayName}!</h1>
             <p className="text-muted-foreground">Ready to build something amazing today?</p>
           </div>
           <div className="flex items-center gap-4">
-            <TrustScore score={87} />
-            <TrustBadge level="gold" />
+            <TrustScore score={profile?.trust_score || 0} />
+            <TrustBadge level={profile?.trust_level as any || "bronze"} />
           </div>
         </div>
 
@@ -198,13 +215,26 @@ function FreelancerDashboard() {
 }
 
 function ClientDashboard() {
+  const { profile, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'User';
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <Navigation userType="client" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Client Dashboard</h1>
+            <h1 className="text-3xl font-bold">Welcome {displayName}</h1>
             <p className="text-muted-foreground">Manage your projects and find trusted talent</p>
           </div>
           <Button className="bg-gradient-hero text-white shadow-trust">
@@ -301,12 +331,25 @@ function ClientDashboard() {
 }
 
 function AdminDashboard() {
+  const { profile, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  const displayName = profile?.full_name || profile?.email?.split('@')[0] || 'Admin';
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <Navigation userType="admin" />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold">Welcome {displayName}</h1>
           <p className="text-muted-foreground">Platform oversight and management</p>
         </div>
 
