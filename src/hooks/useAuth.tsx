@@ -42,6 +42,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Redirect to dashboard after successful OAuth login
+        if (event === 'SIGNED_IN' && session && window.location.pathname === '/') {
+          window.location.href = '/dashboard';
+        }
       }
     );
 
