@@ -21,13 +21,26 @@ import {
 } from "lucide-react";
 
 interface DashboardProps {
-  userType: "freelancer" | "client" | "admin";
+  userType?: "freelancer" | "client" | "admin";
 }
 
 export default function Dashboard({ userType }: DashboardProps) {
-  if (userType === "freelancer") {
+  const { profile, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // Use profile user_type if no userType prop is provided
+  const effectiveUserType = userType || (profile?.user_type as "freelancer" | "client" | "admin") || "freelancer";
+
+  if (effectiveUserType === "freelancer") {
     return <FreelancerDashboard />;
-  } else if (userType === "client") {
+  } else if (effectiveUserType === "client") {
     return <ClientDashboard />;
   } else {
     return <AdminDashboard />;

@@ -21,17 +21,25 @@ import {
 import heroImage from "@/assets/hero-image.jpg";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const { user } = useAuth();
+  const { profile, loading } = useProfile();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
+    if (user && !loading) {
+      if (!profile?.user_type) {
+        // New user needs to select user type
+        navigate('/onboarding');
+      } else {
+        // Existing user goes to dashboard
+        navigate('/dashboard');
+      }
     }
-  }, [user, navigate]);
+  }, [user, profile, loading, navigate]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import UserTypeSelection from "./pages/UserTypeSelection";
 import AdminAccess from "./pages/AdminAccess";
 import NotFound from "./pages/NotFound";
 
@@ -26,10 +27,18 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route 
+                path="/onboarding" 
+                element={
+                  <ProtectedRoute>
+                    <UserTypeSelection />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
                 path="/dashboard" 
                 element={
                   <ProtectedRoute>
-                    <Dashboard userType="freelancer" />
+                    <Dashboard />
                   </ProtectedRoute>
                 } 
               />

@@ -56,7 +56,8 @@ const Auth = () => {
     if (error) {
       setError(error.message);
     } else {
-      navigate('/dashboard');
+      // User will be redirected by useEffect in Index component
+      navigate('/');
     }
     
     setLoading(false);
