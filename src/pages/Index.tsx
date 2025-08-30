@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/Navigation";
+import { Footer } from "@/components/Footer";
 import { TrustBadge } from "@/components/TrustBadge";
 import { StatsCard } from "@/components/StatsCard";
 import { 
@@ -283,27 +284,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-8 h-8 bg-gradient-trust rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-bold bg-gradient-trust bg-clip-text text-transparent">
-                Inspired Devs
-              </span>
-            </div>
-            <p className="text-muted-foreground mb-4">
-              Building unbreakable trust between freelancers and clients across Africa.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              © 2024 Inspired Devs. Proudly made in Nigeria 🇳🇬
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

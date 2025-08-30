@@ -81,14 +81,15 @@ export function Navigation({ userType, trustLevel }: NavigationProps) {
             {currentNav.map((item) => {
               const Icon = item.icon;
               return (
-                <Button
-                  key={item.href}
-                  variant="ghost"
-                  className="flex items-center gap-2"
-                >
-                  <Icon className="w-4 h-4" />
-                  {item.label}
-                </Button>
+                <Link key={item.href} to={item.href}>
+                  <Button
+                    variant="ghost"
+                    className="flex items-center gap-2"
+                  >
+                    <Icon className="w-4 h-4" />
+                    {item.label}
+                  </Button>
+                </Link>
               );
             })}
           </div>
@@ -146,14 +147,16 @@ export function Navigation({ userType, trustLevel }: NavigationProps) {
               {currentNav.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <Button
-                    key={item.href}
-                    variant="ghost"
-                    className="justify-start gap-2"
-                  >
-                    <Icon className="w-4 h-4" />
-                    {item.label}
-                  </Button>
+                  <Link key={item.href} to={item.href}>
+                    <Button
+                      variant="ghost"
+                      className="justify-start gap-2"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <Icon className="w-4 h-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
                 );
               })}
             </div>
