@@ -13,7 +13,14 @@ import UserTypeSelection from "./pages/UserTypeSelection";
 import Jobs from "./pages/Jobs";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
+import Proposals from "./pages/Proposals";
+import PostJob from "./pages/PostJob";
+import Talent from "./pages/Talent";
+import MyJobs from "./pages/MyJobs";
+import AdminDashboard from "./pages/AdminDashboard";
 import AdminAccess from "./pages/AdminAccess";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -71,13 +78,47 @@ const App = () => (
               />
               <Route path="/admin-secret-access-portal-xyz" element={<AdminAccess />} />
               <Route 
-                path="/admin" 
+                path="/proposals" 
                 element={
-                  <ProtectedRoute requireAdmin>
-                    <Dashboard userType="admin" />
+                  <ProtectedRoute>
+                    <Proposals />
                   </ProtectedRoute>
                 } 
               />
+              <Route 
+                path="/post-job" 
+                element={
+                  <ProtectedRoute>
+                    <PostJob />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/talent" 
+                element={
+                  <ProtectedRoute>
+                    <Talent />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/my-jobs" 
+                element={
+                  <ProtectedRoute>
+                    <MyJobs />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute requireAdmin>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
