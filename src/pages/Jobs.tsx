@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useProfile } from "@/hooks/useProfile";
+import { useJobs } from "@/hooks/useJobs";
 import { 
   Search, 
   MapPin, 
@@ -16,71 +14,9 @@ import {
   Star
 } from "lucide-react";
 
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  budget: string;
-  location: string;
-  posted_at: string;
-  skills: string[];
-  client_name: string;
-  client_rating: number;
-  proposals_count: number;
-}
-
 const Jobs = () => {
-  const { profile } = useProfile();
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { jobs, loading, error } = useJobs();
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Mock job data - replace with actual API call
-  useEffect(() => {
-    const mockJobs: Job[] = [
-      {
-        id: "1",
-        title: "Full-Stack Developer for E-commerce Platform",
-        description: "Looking for an experienced developer to build a modern e-commerce platform with React and Node.js. Must have experience with payment integration and responsive design.",
-        budget: "$2,000 - $5,000",
-        location: "Nigeria",
-        posted_at: "2 hours ago",
-        skills: ["React", "Node.js", "MongoDB", "Payment Integration"],
-        client_name: "TechCorp Africa",
-        client_rating: 4.8,
-        proposals_count: 12
-      },
-      {
-        id: "2",
-        title: "Mobile App UI/UX Designer",
-        description: "Need a talented designer to create mobile app mockups for a fintech startup. Experience with African market preferences preferred.",
-        budget: "$800 - $1,500",
-        location: "Kenya",
-        posted_at: "5 hours ago",
-        skills: ["Figma", "Mobile Design", "Fintech", "User Research"],
-        client_name: "FinStart Solutions",
-        client_rating: 4.5,
-        proposals_count: 8
-      },
-      {
-        id: "3",
-        title: "Digital Marketing Specialist",
-        description: "Looking for a marketing expert to handle social media campaigns and content creation for our African expansion.",
-        budget: "$500 - $1,000",
-        location: "South Africa",
-        posted_at: "1 day ago",
-        skills: ["Social Media", "Content Creation", "SEO", "Analytics"],
-        client_name: "Growth Marketing Ltd",
-        client_rating: 4.9,
-        proposals_count: 15
-      }
-    ];
-
-    setTimeout(() => {
-      setJobs(mockJobs);
-      setLoading(false);
-    }, 1000);
-  }, []);
 
   const filteredJobs = jobs.filter(job =>
     job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -89,25 +25,26 @@ const Jobs = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation userType={profile?.user_type as any} trustLevel={profile?.trust_level as any} />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="h-48 bg-muted" />
-            ))}
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse space-y-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="h-48 bg-muted" />
+          ))}
         </div>
-        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center text-destructive">Error: {error}</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation userType={profile?.user_type as any} trustLevel={profile?.trust_level as any} />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Find Work</h1>
@@ -146,20 +83,22 @@ const Jobs = () => {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                       <div className="flex items-center gap-1">
                         <DollarSign className="w-4 h-4" />
-                        {job.budget}
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {job.location}
+                        ₦{job.budget.toLocaleString()}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="w-4 h-4" />
-                        {job.posted_at}
+                        {new Date(job.created_at).toLocaleDateString()}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className={`inline-block w-2 h-2 rounded-full ${
+                          job.status === 'open' ? 'bg-success' : 'bg-muted'
+                        }`} />
+                        {job.status}
                       </div>
                     </div>
                   </div>
                   <Badge variant="outline" className="ml-4">
-                    {job.proposals_count} proposals
+                    {job.status}
                   </Badge>
                 </div>
               </CardHeader>
@@ -180,13 +119,12 @@ const Jobs = () => {
                       <Briefcase className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-medium">{job.client_name}</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                      <span className="text-sm">{job.client_rating}</span>
-                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Verified
+                    </Badge>
                   </div>
-                  <Button className="bg-gradient-hero text-white">
-                    Submit Proposal
+                  <Button disabled={job.status !== 'open'} className="bg-gradient-hero text-white">
+                    {job.status === 'open' ? 'Submit Proposal' : 'Not Available'}
                   </Button>
                 </div>
               </CardContent>
@@ -205,9 +143,6 @@ const Jobs = () => {
             </CardContent>
           </Card>
         )}
-      </div>
-      
-      <Footer />
     </div>
   );
 };

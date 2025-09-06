@@ -5,14 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { Shield, Github, Chrome, AlertCircle, Loader2 } from 'lucide-react';
+import { Shield, Github, Chrome, AlertCircle, Loader2, Users, Briefcase } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [userType, setUserType] = useState<'freelancer' | 'client'>('freelancer');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -30,7 +32,10 @@ const Auth = () => {
     setLoading(true);
     setError('');
     
-    const { error } = await signUp(email, password, { full_name: fullName });
+    const { error } = await signUp(email, password, { 
+      full_name: fullName,
+      user_type: userType 
+    });
     
     if (error) {
       setError(error.message);
@@ -96,6 +101,36 @@ const Auth = () => {
             <CardDescription>
               Join Africa's most trusted freelancing platform
             </CardDescription>
+            
+            {/* User Type Selection for Sign Up */}
+            <div className="flex justify-center mt-4">
+              <div className="flex bg-muted rounded-lg p-1">
+                <button
+                  type="button"
+                  onClick={() => setUserType('freelancer')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    userType === 'freelancer' 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  I'm a Freelancer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUserType('client')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                    userType === 'client' 
+                      ? 'bg-background text-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Briefcase className="w-4 h-4" />
+                  I'm a Client
+                </button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
@@ -169,9 +204,14 @@ const Auth = () => {
                       required
                     />
                   </div>
+                  <div className="text-xs text-muted-foreground mb-3 text-center">
+                    Creating account as: <Badge variant="outline" className="ml-1">
+                      {userType === 'freelancer' ? 'Freelancer' : 'Client'}
+                    </Badge>
+                  </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                    Create Account
+                    Create Account as {userType === 'freelancer' ? 'Freelancer' : 'Client'}
                   </Button>
                 </form>
               </TabsContent>

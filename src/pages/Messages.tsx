@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useProfile } from "@/hooks/useProfile";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMessages } from "@/hooks/useMessages";
 import { 
   MessageSquare, 
   Search, 
@@ -17,65 +16,54 @@ import {
   Paperclip
 } from "lucide-react";
 
-interface Conversation {
-  id: string;
-  name: string;
-  lastMessage: string;
-  timestamp: string;
-  unread: number;
-  avatar: string;
-  online: boolean;
-}
-
 const Messages = () => {
-  const { profile } = useProfile();
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const { conversations, messages, loading, error, fetchMessages, sendMessage } = useMessages();
 
-  const conversations: Conversation[] = [
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      lastMessage: "Thanks for the proposal! When can we start?",
-      timestamp: "2 min ago",
-      unread: 2,
-      avatar: "SJ",
-      online: true
-    },
-    {
-      id: "2", 
-      name: "TechCorp Africa",
-      lastMessage: "We'd like to discuss the project timeline",
-      timestamp: "1 hour ago",
-      unread: 0,
-      avatar: "TC",
-      online: false
-    },
-    {
-      id: "3",
-      name: "David Okafor",
-      lastMessage: "The designs look great! Just a few minor changes",
-      timestamp: "3 hours ago",
-      unread: 1,
-      avatar: "DO",
-      online: true
+  useEffect(() => {
+    if (conversations.length > 0 && !selectedChat) {
+      setSelectedChat(conversations[0].id);
     }
-  ];
+  }, [conversations, selectedChat]);
 
-  const selectedChat = conversations.find(c => c.id === selectedConversation);
+  useEffect(() => {
+    if (selectedChat) {
+      fetchMessages(selectedChat);
+    }
+  }, [selectedChat]);
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      // TODO: Send message logic
+  const handleSendMessage = async () => {
+    if (newMessage.trim() && selectedChat) {
+      await sendMessage(selectedChat, newMessage);
       setNewMessage("");
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Navigation userType={profile?.user_type as any} trustLevel={profile?.trust_level as any} />
-      
+  const selectedConversation = conversations.find(conv => conv.id === selectedChat);
+  const filteredConversations = conversations.filter(conv =>
+    conv.participants.some(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  if (loading) {
+    return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">Loading messages...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center text-destructive">Error: {error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-4">Messages</h1>
@@ -94,70 +82,88 @@ const Messages = () => {
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input placeholder="Search conversations..." className="pl-10" />
+                <Input 
+                  placeholder="Search conversations..." 
+                  className="pl-10"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="space-y-1">
-                {conversations.map((conversation) => (
-                  <div
-                    key={conversation.id}
-                    className={`p-4 cursor-pointer hover:bg-muted transition-colors ${
-                      selectedConversation === conversation.id ? 'bg-muted' : ''
-                    }`}
-                    onClick={() => setSelectedConversation(conversation.id)}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="relative">
-                        <Avatar>
-                          <AvatarFallback className="bg-gradient-trust text-white">
-                            {conversation.avatar}
-                          </AvatarFallback>
-                        </Avatar>
-                        {conversation.online && (
-                          <div className="absolute -bottom-0 -right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-background"></div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-medium text-sm truncate">{conversation.name}</h3>
-                          <span className="text-xs text-muted-foreground">{conversation.timestamp}</span>
+              <ScrollArea className="h-[480px]">
+                {filteredConversations.map((conversation) => {
+                  const otherParticipant = conversation.participants.find(p => p.id !== 'current');
+                  return (
+                    <div
+                      key={conversation.id}
+                      onClick={() => setSelectedChat(conversation.id)}
+                      className={`p-4 border-b border-border hover:bg-muted/50 cursor-pointer transition-colors ${
+                        selectedChat === conversation.id ? 'bg-muted' : ''
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="relative">
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage src={otherParticipant?.avatar} />
+                            <AvatarFallback>{otherParticipant?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <span className="absolute bottom-0 right-0 w-3 h-3 bg-success border-2 border-background rounded-full"></span>
                         </div>
-                        <p className="text-sm text-muted-foreground truncate mt-1">
-                          {conversation.lastMessage}
-                        </p>
+                        
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-medium text-sm truncate">{otherParticipant?.name}</h3>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(conversation.last_message_time).toLocaleTimeString()}
+                            </span>
+                          </div>
+                          
+                          <p className="text-xs text-muted-foreground mb-1 truncate">
+                            {conversation.job_title}
+                          </p>
+                          
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm text-muted-foreground truncate flex-1">
+                              {conversation.last_message}
+                            </p>
+                            {conversation.unread_count > 0 && (
+                              <Badge className="ml-2 bg-primary text-primary-foreground text-xs">
+                                {conversation.unread_count}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      {conversation.unread > 0 && (
-                        <Badge className="bg-primary text-primary-foreground text-xs">
-                          {conversation.unread}
-                        </Badge>
-                      )}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  );
+                })}
+              </ScrollArea>
             </CardContent>
           </Card>
 
           {/* Chat Area */}
           <Card className="lg:col-span-2 shadow-card flex flex-col">
-            {selectedChat ? (
+            {selectedConversation ? (
               <>
                 {/* Chat Header */}
                 <CardHeader className="border-b">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarFallback className="bg-gradient-trust text-white">
-                          {selectedChat.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <h3 className="font-semibold">{selectedChat.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          {selectedChat.online ? "Online" : "Last seen 2 hours ago"}
-                        </p>
-                      </div>
+                      {selectedConversation && (
+                        <>
+                          <Avatar className="w-8 h-8">
+                            <AvatarImage src={selectedConversation.participants.find(p => p.id !== 'current')?.avatar} />
+                            <AvatarFallback>
+                              {selectedConversation.participants.find(p => p.id !== 'current')?.name.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <h3 className="font-medium">{selectedConversation.participants.find(p => p.id !== 'current')?.name}</h3>
+                            <p className="text-xs text-muted-foreground">{selectedConversation.job_title}</p>
+                          </div>
+                        </>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <Button variant="ghost" size="icon">
@@ -174,28 +180,33 @@ const Messages = () => {
                 </CardHeader>
 
                 {/* Messages */}
-                <CardContent className="flex-1 p-4 overflow-y-auto">
-                  <div className="space-y-4">
-                    {/* Sample messages */}
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg p-3 max-w-xs">
-                        <p className="text-sm">Hi! I saw your proposal for the e-commerce project. Very impressive!</p>
-                        <span className="text-xs text-muted-foreground">2:30 PM</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="bg-primary text-primary-foreground rounded-lg p-3 max-w-xs">
-                        <p className="text-sm">Thank you! I'd love to discuss the project details with you.</p>
-                        <span className="text-xs opacity-80">2:32 PM</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg p-3 max-w-xs">
-                        <p className="text-sm">{selectedChat.lastMessage}</p>
-                        <span className="text-xs text-muted-foreground">2:35 PM</span>
-                      </div>
-                    </div>
-                  </div>
+                <CardContent className="flex-1 p-0">
+                  <ScrollArea className="h-[400px] p-4">
+                    {messages.map((message) => {
+                      const isOwn = message.sender_id === 'current';
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-4`}
+                        >
+                          <div className={`max-w-[70%] rounded-lg p-3 ${
+                            isOwn 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-muted'
+                          }`}>
+                            <p className="text-sm">{message.content}</p>
+                            <p className={`text-xs mt-1 ${
+                              isOwn 
+                                ? 'text-primary-foreground/70' 
+                                : 'text-muted-foreground'
+                            }`}>
+                              {new Date(message.created_at).toLocaleTimeString()}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </ScrollArea>
                 </CardContent>
 
                 {/* Message Input */}
@@ -234,9 +245,6 @@ const Messages = () => {
           </Card>
         </div>
       </div>
-      
-      <Footer />
-    </div>
   );
 };
 

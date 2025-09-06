@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Layout } from "@/components/Layout";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -39,88 +40,136 @@ const App = () => (
               <Route 
                 path="/onboarding" 
                 element={
-                  <ProtectedRoute>
-                    <UserTypeSelection />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <UserTypeSelection />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/dashboard" 
                 element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/jobs" 
                 element={
-                  <ProtectedRoute>
-                    <Jobs />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <Jobs />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/profile" 
                 element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/messages" 
                 element={
-                  <ProtectedRoute>
-                    <Messages />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <Messages />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
-              <Route path="/admin-secret-access-portal-xyz" element={<AdminAccess />} />
+              <Route 
+                path="/admin-secret-access-portal-xyz" 
+                element={
+                  <Layout showNavigation={false} showFooter={false}>
+                    <AdminAccess />
+                  </Layout>
+                } 
+              />
               <Route 
                 path="/proposals" 
                 element={
-                  <ProtectedRoute>
-                    <Proposals />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <Proposals />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/post-job" 
                 element={
-                  <ProtectedRoute>
-                    <PostJob />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <PostJob />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/talent" 
                 element={
-                  <ProtectedRoute>
-                    <Talent />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <Talent />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/my-jobs" 
                 element={
-                  <ProtectedRoute>
-                    <MyJobs />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute>
+                      <MyJobs />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
               <Route 
                 path="/admin" 
                 element={
-                  <ProtectedRoute requireAdmin>
-                    <AdminDashboard />
-                  </ProtectedRoute>
+                  <Layout>
+                    <ProtectedRoute requireAdmin>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  </Layout>
                 } 
               />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/terms" element={<Terms />} />
+              <Route 
+                path="/privacy" 
+                element={
+                  <Layout>
+                    <Privacy />
+                  </Layout>
+                } 
+              />
+              <Route 
+                path="/terms" 
+                element={
+                  <Layout>
+                    <Terms />
+                  </Layout>
+                } 
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+              <Route 
+                path="*" 
+                element={
+                  <Layout>
+                    <NotFound />
+                  </Layout>
+                } 
+              />
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
